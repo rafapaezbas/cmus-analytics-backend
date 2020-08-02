@@ -8,7 +8,7 @@ import Data.Text.Lazy (pack,unpack)
 import Data.Maybe
 import Data.Time.Clock.POSIX
 import Database.MongoDB    (Action, Document, Document, Value, access,
-                            allCollections, insert_, close, connect, delete, exclude, find,
+                            allCollections, insert, close, connect, delete, exclude, find,
                             host,findOne, insertMany, master, project, rest,
                             select, liftDB, sort, Val, at, (=:))
 
@@ -24,8 +24,8 @@ main = scotty 3000 $ do
         id <- liftIO $ getTimeInMillis
         b <- body
 	let decodedBody = unpack(decodeUtf8 b)
-	i <- liftIO $ run $ insertLog id decodedBody
-        text $ "Ok"
+	i <- liftIO $ insertLog (show id) decodedBody
+        text $ pack $ show id
 
 --setup database connection
 run::MonadIO m => Action m a -> m a 
@@ -47,5 +47,6 @@ getContent document = case document of
 getTimeInMillis ::Integral b => IO b
 getTimeInMillis = round `fmap` getPOSIXTime
 
-insertLog::MonadIO m => Int -> String -> Action m ()
-insertLog id body = run $ insert_ "logs" ["id" =: id, "content" =: body]
+-- Insert log with id and content
+insertLog::MonadIO m => String -> String -> m Value
+insertLog id body = run $ insert "logs" ["id" =: id, "content" =: body]
