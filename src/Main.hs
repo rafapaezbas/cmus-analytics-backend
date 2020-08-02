@@ -1,16 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 import Web.Scotty
-import Data.Monoid (mconcat)
-import Control.Monad.Trans(liftIO,lift,MonadIO)
+import Control.Monad.Trans(liftIO,MonadIO)
 import System.IO
 import Data.Text.Lazy.Encoding (decodeUtf8)
 import Data.Text.Lazy (pack,unpack)
 import Data.Maybe
 import Data.Time.Clock.POSIX
-import Database.MongoDB    (Action, Document, Document, Value, access,
-                            allCollections, insert, close, connect, delete, exclude, find,
-                            host,findOne, insertMany, master, project, rest,
-                            select, liftDB, sort, Val, at, (=:))
+import Database.MongoDB    (Action, Document, Value, access,
+                            allCollections, insert, connect,
+                            host,findOne, insertMany, master, 
+                            select, Val, at, (=:))
 
 main :: IO ()
 main = scotty 3000 $ do
