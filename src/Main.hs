@@ -17,14 +17,14 @@ import Database.MongoDB    (Action, Document, Value, access,
 main :: IO ()
 main = scotty 3000 $ do
 
+    get "/logs/random" $ do
+	logs <- liftIO $ selectRandom 1
+	text $ LT.pack $ getContent $ Just $ Prelude.head logs
+
     get "/logs/:id" $ do
 	id <- param "id"
 	log <- liftIO $ selectById $ LT.unpack id
 	text $ LT.pack $ getContent log
-
-    get "/logs/random" $ do
-	logs <- liftIO $ selectRandom 2
-	text $ LT.pack $ getContent $ Just $ Prelude.head logs
 
     post "/logs" $ do
         b <- body
@@ -43,7 +43,7 @@ run action = do
 selectById :: (MonadIO m, Val v) => v -> m (Maybe Document)
 selectById id = run $ findOne(select ["id" =: id] "logs")
 
---Select document by id field, 
+--Select random document
 selectRandom :: (MonadIO m,MonadFail m) => Integer -> m [Document]
 selectRandom size = run $ aggregate "logs" [["$sample" =: [ "size" =: size ]]]
 
