@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 import Data.Digest.Pure.MD5 (md5)
 import Web.Scotty
+import Network.Wai.Middleware.Cors
 import Control.Monad.Trans(liftIO,MonadIO)
 import Control.Monad.Fail
 import System.IO
@@ -9,13 +10,16 @@ import Data.ByteString.Lazy.Char8 as LB
 import Data.Text.Lazy as LT (pack,unpack)
 import Data.Maybe
 import Data.Time.Clock.POSIX
+import Web.Scotty.TLS
 import Database.MongoDB    (Action, Document, Value, access,
                             allCollections, upsert, connect,
                             host,findOne, insertMany, master, 
                             select,aggregate, Val, at, (=:))
 
 main :: IO ()
-main = scotty 3000 $ do
+main = scottyTLS 443 "/home/ubuntu/ssl-certs/cert.key" "/home/ubuntu/ssl-certs/cert.crt" $ do
+
+    middleware simpleCors
 
     get "/logs/random" $ do
 	logs <- liftIO $ selectRandom 1
